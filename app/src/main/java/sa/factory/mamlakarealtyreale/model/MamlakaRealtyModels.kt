@@ -1,8 +1,7 @@
 package sa.factory.mamlakarealtyreale.model
 
-import kotlinx.serialization.Serializable
+import java.io.Serializable
 
-@Serializable
 data class MamlakaRealtyItem(
     val id: String,
     val title: String,
@@ -11,9 +10,8 @@ data class MamlakaRealtyItem(
     val badge: String = "معتمد",
     val category: String = "عام",
     val status: String = "AVAILABLE"
-)
+) : Serializable
 
-@Serializable
 data class MamlakaRealtyOrder(
     val orderId: String,
     val items: List<MamlakaRealtyItem>,
@@ -23,9 +21,8 @@ data class MamlakaRealtyOrder(
     val paymentMethod: String = "Mada Contactless EMV",
     val timestamp: Long = System.currentTimeMillis(),
     val status: String = "CONFIRMED"
-)
+) : Serializable
 
-@Serializable
 data class MamlakaRealtyTelemetry(
     val peripheralName: String,
     val status: String,
@@ -33,11 +30,48 @@ data class MamlakaRealtyTelemetry(
     val batteryPct: Int = 98,
     val signalDbm: Int = -58,
     val timestamp: Long = System.currentTimeMillis()
-)
+) : Serializable
 
-sealed interface UiState<out T> {
-    object Loading : UiState<Nothing>
-    data class Success<T>(val data: T) : UiState<T>
-    data class Error(val message: String) : UiState<Nothing>
-    object Empty : UiState<Nothing>
+sealed class UiState<out T> {
+    object Loading : UiState<Nothing>()
+    data class Success<T>(val data: T) : UiState<T>()
+    data class Error(val message: String) : UiState<Nothing>()
+    object Empty : UiState<Nothing>()
 }
+
+enum class RoomSpaceType {
+    MAJLIS_RECEPTION,
+    MASTER_SUITE,
+    LIVING_SALON,
+    DINING_HALL,
+    BALCONY_TERRACE,
+    CORRIDOR
+}
+
+data class LidarPoint2D(
+    val xMeters: Double,
+    val yMeters: Double,
+    val distanceMm: Int,
+    val angleDeg: Double,
+    val quality: Int
+) : Serializable
+
+data class LidarScanPacket(
+    val startAngleDeg: Double,
+    val endAngleDeg: Double,
+    val points: List<LidarPoint2D>,
+    val validPointCount: Int,
+    val isValid: Boolean,
+    val rawFrameHex: String
+) : Serializable
+
+data class FloorplanMetrics(
+    val roomType: RoomSpaceType,
+    val areaSquareMeters: Double,
+    val perimeterMeters: Double,
+    val vertexCount: Int,
+    val boundingBoxWidthM: Double,
+    val boundingBoxLengthM: Double,
+    val confidenceScore: Double,
+    val timestampEpochMs: Long = System.currentTimeMillis()
+) : Serializable
